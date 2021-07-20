@@ -4,7 +4,9 @@ using Microsoft.Extensions.Logging;
 using ProductService.Dto;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
+using Dapr;
 
 namespace ProductService.Controllers
 {
@@ -78,6 +80,14 @@ namespace ProductService.Controllers
                 _logger.LogError(ex.Message);
                 throw;
             }
+        }
+
+        [Topic("pubsub", "set-val")]
+        [Route("subscribe")]
+        [HttpPost]
+        public async Task SubscribeEvent(ProductDto dto)
+        {
+            _logger.LogInformation($"subscription：{JsonSerializer.Serialize(dto)}");
         }
     }
 }

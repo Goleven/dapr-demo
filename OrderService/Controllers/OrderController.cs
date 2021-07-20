@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Bogus;
 using Dapr.Client;
@@ -78,6 +79,21 @@ namespace OrderService.Controllers
                 _logger.LogError(ex.Message);
                 throw;
             }
+        }
+
+        [HttpPost]
+        [Route("publish")]
+        public async Task PublishEvent()
+        {
+            ProductDto dto = new ProductDto()
+            {
+                ProductID = Guid.NewGuid(),
+                Price = 0,
+                ProductName = "product",
+                SupplerName = "supplier"
+            };
+            _logger.LogInformation($"publisher：{JsonSerializer.Serialize(dto)}");
+            await _daprClient.PublishEventAsync<ProductDto>("pubsub", "set-val", dto);
         }
     }
 }
